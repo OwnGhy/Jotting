@@ -17,3 +17,5 @@ console.log(eight - six == two)
 打算好好学习下关于js浮点数精度的问题。
 
 参考文章： [JavaScript 浮点数陷阱及解法](https://github.com/camsong/blog/issues/9)
+
+未完待续...
