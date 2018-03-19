@@ -10,14 +10,14 @@
 3. 根据复选框不同的选中状态设置背景图片的位置。
 
 图片如下：
-![]()
+![checkbox.png](https://github.com/OwnGhy/Jotting/blob/master/assets/CSS/checkbox.png?raw=true)
 
 代码：
 
 ```
 input[type="checkbox"] {
   -webkit-appearance: none;  /*清除复选框默认样式*/
-  background: #fff url(i/blue.png);
+  background: #fff url(checkbox.png);
   height: 22px;   /*高度*/
   vertical-align: middle;
   width: 22px;
