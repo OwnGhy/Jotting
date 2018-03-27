@@ -1,4 +1,4 @@
-## css踩坑
+## CSS踩坑
 ### 多行文本溢出省略显示-webkit-box-orient: vertical;属性不渲染问题
 实现多行文本溢出省略显示的方法主要有两种：
 
@@ -55,3 +55,13 @@ var css = postcss([
 console.log(css);
 ```
 参考：[https://github.com/postcss/autoprefixer/issues/776](https://github.com/postcss/autoprefixer/issues/776)
+
+### 使用scrollTop获取到始终为0？
+今天遇到这样的需求，需要使用scrollTop结合pageY计算出鼠标相对于浏览器窗口的位置。但是始终获取scrollTop结果为0。如图所示。
+![scrollTop.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/CSS/scrollTop.jpeg?raw=true)
+
+从右边的滚动条看出页面滚动了，但是获取不到滚动的值。
+
+原因：scrollTop获取的是元素自己被卷去的高度，针对设置了```overflow:scroll;```样式的元素。针对自己由于内容超过浏览器高度或宽度的滚动不属于scrollTop的类型。
+
+解决办法：给元素设置明确的宽高与```overflow:scroll;```
