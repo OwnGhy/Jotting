@@ -173,3 +173,9 @@ BFC(Block formatting context)直译为"块级格式化上下文"。它是一个�
 - 防止垂直 margin 重叠：借用**Box垂直方向的距离由margin决定。属于同一个BFC的两个相邻Box的margin会发生重叠**规则，使其属于不同的BFC。
 
 ---
+### 0.8宽度border导致iphone白边?
+描述：我给div设置了.8的border，最后一个border设置为border none，但是出现了白边。
+
+解决办法： 使用1px的border
+
+---
