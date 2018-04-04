@@ -38,10 +38,10 @@ exports.updateUser = async (ctx, next) => {
 测试如下：
 
 ###### 正常输出情况
-![async_await1.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/CSS/async_await1.jpeg?raw=true)
+![async_await1.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/JS/async_await1.jpeg?raw=true)
 
 ###### 抛出异常情况
-![async_await2.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/CSS/async_await2.jpeg?raw=true)
+![async_await2.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/JS/async_await2.jpeg?raw=true)
 
 ###### catch异常
-![async_await3.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/CSS/async_await3.jpeg?raw=true)
+![async_await3.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/JS/async_await3.jpeg?raw=true)

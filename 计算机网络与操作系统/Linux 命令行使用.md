@@ -24,7 +24,7 @@
 4. 图形用户界面调试工具：xde
 
 ### 文件操作
-![文件权限.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/net_os/文件权限.jpeg?raw=true)
+![file_auth.jpeg](https://github.com/OwnGhy/Jotting/blob/master/assets/net_os/file_auth.jpeg?raw=true)
 
 1. 显示或连接文件： cat
 2. 分页格式化显示文件内容：pg
