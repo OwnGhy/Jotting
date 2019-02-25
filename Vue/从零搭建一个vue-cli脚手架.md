@@ -320,10 +320,9 @@ webpack.config.js中引入clean-webpack-plugin包并在plugins中配置：
 ```js
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-plugins: [
-    htmlPlugin,
-    new CleanWebpackPlugin(['dist'])
-]
+if (process.env.NODE_ENV === 'production') {
+	config.plugins.push(new CleanWebpackPlugin(['dist']));
+}
 ```
 配置之后，每次运行npm run build就可以清理dist文件夹之前的内容了。
 
