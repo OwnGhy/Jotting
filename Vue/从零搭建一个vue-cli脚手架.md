@@ -51,7 +51,7 @@ npm i -D webpack webpack-cli
 
 ```json
 "scripts": {
-    "build": "cross-env NODE_ENV= production webpack --moe=production --config webpack.config.js",
+    "build": "cross-env NODE_ENV=production webpack --moe=production --config webpack.config.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
 ```
@@ -459,3 +459,266 @@ plugins: [
 运行npm run build就可以成功单独提取css了。
 
 关于npm安装@next的解释参考这里👉[npm使用小技巧](https://www.jianshu.com/p/aee822f0ee7a)
+
+### 自动解析确定的扩展
+当前配置中，引用.vue等后缀的文件，不能省略后缀，必须明确写出，否则，无法识别。
+
+可以使用resolve的extensions配置，在webpack.config.js中添加下面的配置即可。
+
+```
+// other configurations
+
+resolve: {
+    extensions: ['*', '.js', '.vue', '.json']
+}
+
+// other configurations
+```
+现在就可以愉快的引入文件且不添加后缀啦。
+
+### 分离生产环境和开发环境的webpack配置，使用webpack-merge合并通用配置
+
+这一部分官网具体有说：[https://webpack.docschina.org/guides/production/](https://webpack.docschina.org/guides/production/)
+
+在上面的配置中，使用 npm run dev 运行开发环境，npm run build 运行生产环境。开发环境和生产环境的配置都在 webpack.config.js 中，对于两种环境不同的配置，使用 if 逻辑进行了判断与单独配置。当配置逻辑逐渐增加，if 中的逻辑会逐渐臃肿，所以有必要对生产环境和开发环境的配置进行分离。
+
+创建webpack.config.dev.js：
+
+```
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+const htmlPlugin = new HtmlWebpackPlugin({
+    // 生成的html的title
+    title: 'Vue Starter',
+    // 生成的html的文件名
+    filename: 'index.html',
+    // 注入bundle到body中
+    inject: 'body'
+});
+
+const config = {
+    entry: './src/main.js',
+    output: {
+        filename: 'bundle.[hash].js',
+        path: path.resolve(__dirname, './dist/')
+    },
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                loader:'vue-loader',
+                options: {
+                    extractCSS: true
+                }
+            },
+            {
+                test: /\.css$/,
+                loader:'css-loader'
+            },
+            {
+                test: /\.less$/,
+                loader: 'style!css!less'
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                loader: 'url-loader'
+            }
+        ]
+    },
+    plugins: [
+        htmlPlugin,
+        new ExtractTextPlugin('style.[hash].css')
+    ],
+    resolve: {
+        extensions: ['*', '.js', '.vue', '.json']
+    },
+    devtool: false,
+    devServer: {
+        noInfo: true
+    }
+};
+module.exports = config;
+```
+
+去掉了生产环境判断添加配置的逻辑。
+
+创建webpack.config.pro.js：
+
+```
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+const htmlPlugin = new HtmlWebpackPlugin({
+    // 生成的html的title
+    title: 'Vue Starter',
+    // 生成的html的文件名
+    filename: 'index.html',
+    // 注入bundle到body中
+    inject: 'body'
+});
+
+const config = {
+    entry: './src/main.js',
+    output: {
+        filename: 'bundle.[hash].js',
+        path: path.resolve(__dirname, './dist/')
+    },
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                loader:'vue-loader',
+                options: {
+                    extractCSS: true
+                }
+            },
+            {
+                test: /\.css$/,
+                loader:'css-loader'
+            },
+            {
+                test: /\.less$/,
+                loader: 'style!css!less'
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                loader: 'url-loader'
+            }
+        ]
+    },
+    plugins: [
+        htmlPlugin,
+        new ExtractTextPlugin('style.[hash].css'),
+        new CleanWebpackPlugin(['dist'])
+    ],
+    resolve: {
+        extensions: ['*', '.js', '.vue', '.json']
+    },
+    devtool: '#source-map',
+    devServer: {
+        noInfo: true
+    }
+};
+
+module.exports = config;
+```
+将 if 逻辑删除，直接配置生产环境需要的 plugins。
+
+修改 package.json 中开发环境和生产环境的配置文件：
+
+```
+"dev": "cross-env NODE_ENV=development webpack-dev-server --mode=development --config webpack.config.dev.js --open",
+"build": "cross-env NODE_ENV=production webpack --mode=production --config webpack.config.pro.js",
+```
+
+另外，除了一些特殊配置，可以看到还有很多相同的重复配置，本着 DRY 原则，可以提取通用的配置，然后使用 webpack-merge 进行合并。
+
+首先安装 webpack-merge：
+
+```bash
+npm i -D webpack-merge
+```
+
+然后，将之前的 webpack.config.js 改名为 webpack.common.js，修改代码为 生产环境和开发环境通用的配置，主要是通用的 enter、output、module 和通用的 plugins。
+
+```
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+const htmlPlugin = new HtmlWebpackPlugin({
+    // 生成的html的title
+    title: 'Vue Starter',
+    // 生成的html的文件名
+    filename: 'index.html',
+    // 注入bundle到body中
+    inject: 'body'
+});
+
+const config = {
+    entry: './src/main.js',
+    output: {
+        filename: 'bundle.[hash].js',
+        path: path.resolve(__dirname, './dist/')
+    },
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                loader:'vue-loader',
+                options: {
+				    extractCSS: true
+				}
+            },
+            {
+			    test: /\.css$/,
+			    loader:'css-loader'
+			},
+			{
+			    test: /\.less$/,
+			    loader: 'style!css!less'
+			},
+			{
+			    test: /\.(png|jpg|gif)$/,
+			    loader: 'url-loader'
+			}
+        ]
+    },
+    plugins: [
+        htmlPlugin,
+        new ExtractTextPlugin('style.[hash].css')
+    ],
+    resolve: {
+        extensions: ['*', '.js', '.vue', '.json']
+    },
+};
+
+
+module.exports = config;
+```
+现在可以在 生产环境和开发环境的配置文件中使用 webpack-merge 和 通用的 common 配置。
+
+webpack.config.dev.js：
+
+```
+const merge = require('webpack-merge');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+    mode: 'development',
+    devtool: false,
+    devServer: {
+        noInfo: true,
+        open: true
+    }
+});
+```
+
+webpack.config.pro.js：
+
+```
+const merge = require('webpack-merge');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const common = require('./webpack.common.js');
+
+module.exports = merge(common, {
+    mode: 'production',
+    plugins: [
+        new CleanWebpackPlugin(['dist'])
+    ],
+    devtool: '#source-map',
+});
+```
+
+然后修改 package.json，目的在于将之前的 mode 设置直接放到配置文件中，这样可以集中处理生产环境和开发环境的区别配置。
+
+```
+"dev": "cross-env NODE_ENV=development webpack-dev-server --config webpack.config.dev.js",
+"build": "cross-env NODE_ENV=production webpack --config webpack.config.pro.js",
+```
+
+这样就完成了，生产环境与开发环境的配置分离啦～✌️
