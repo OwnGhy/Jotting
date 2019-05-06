@@ -1,4 +1,4 @@
-# Web Components初识
+# Web Components（一）之初识
 
 ## 发展史
 > 关于发展史，可以廖雪峰大大的[MVVM 廖雪峰](https://www.liaoxuefeng.com/wiki/001434446689867b27157e896e74d51a89c25cc8b43bdb3000/001475449022563a6591e6373324d1abd93e0e3fa04397f000)文章，是从前端的发展史开始讲到mvvm的，能让我们很好的理解前端的发胀，以及思考web Components相对于以前的开发方式有什么不同。
@@ -160,3 +160,5 @@ Shadow DOM通过结合\<template\>和\<slot\>，可以减少使用JS创建元素
 3. 如果需要的话，使用Element.attachShadow()方法将一个shadow DOM附加到自定义元素上。使用通常的DOM方法向shadow DOM中添加子元素、事件监听器等等。
 4. 如果需要的话，使用\<template> 和 \<slot>方法定义一个HTML模板。再次使用常规DOM方法克隆模板并将其附加到您的shadow DOM中。
 5. 在页面任何您喜欢的位置使用自定义元素，就像使用常规HTML元素那样。
+
+> 个人理解，web components的四部分，并不是互相区别的，而是相互协作一起使用实现更全面的web componets的。
