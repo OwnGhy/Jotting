@@ -147,7 +147,23 @@ connectedCallback 在自定义元素插入到 DOM 的时候调用，例如 docum
 ### 执行顺序
 
 ```
-constructor -> attributeChangedCallback -> connectedCallback
+constructor() {
+	super();
+	console.log('constructor')
+}
+connectedCallback() {
+    console.log('connectedCallback');
+}
+attributeChangedCallback(attr, odlVal, newVal) {
+        console.log('attributeChangedCallback');
+}
+```
+打印结果是：
+
+```
+constructor
+attributeChangedCallback
+connectedCallback
 ```
 attributeChangedCallback 在 connectedCallback 前面的主要原因为了达到，在自定义元素被插入的时候，可以根据初始的属性去设置一些自定义元素的表现行为。所以在插入元素的时候，先触发一次 attributeChangedCallback，可以进行初始配置。
 
@@ -156,12 +172,74 @@ attributeChangedCallback 在 connectedCallback 前面的主要原因为了达到
 
 在 Web Components 的 constructor 中就可以进行DOM操作了，可以进行 DOM 访问、插入、删除等操作。
 
-## 自定义元素的属性应用
+## 自定义元素的属性
 在 React 或者 Vue 写组件的时候，可以通过在标签上传递 props，然后根据 props 的值做一些表现行为。
 
 在 Web Components 中，如何实现呢？
 
+首先是给自定义标签传入属性，用于初始化设置。给上面的 WordCount 传入 `color="red"`，如下：
 
+```
+<word-count color="red">这是一段用于统计的文字，我也不知道这里有多少个字呢～</word-count>
+```
+然后在`WordCount.js`中添加 color属性的 `getter`，这样就可以直接通过`this.color`获取到属性了：
+
+```
+get color() {
+    return this.getAttribute('color');
+}
+```
+然后在 constructor 中添加根据 this.color 设置样式的逻辑：
+
+```
+let style = document.createElement('style');
+style.textContent = `
+    span {
+        color: ${this.color}
+    }
+`;
+```
+这时候，刷新页面可以看到字数统计部分的 span 的颜色就变成了红色啦✌️。
+
+但是仅仅是根据传入值进行初始化是远远不够的，还需要当 color 属性改变的时候，同时也更新样式。要做到这一点，首先添加`observedAttributes`去监听 attribute color 的改变，然后添加`attributeChangedCallback`生命周期，当 attribute 改变时，去做相应的处理。如下：
+
+```
+static get observedAttributes() {
+    return ['color'];
+}
+
+attributeChangedCallback(attr, odlVal, newVal) {
+    switch(attr) {
+        case 'color':
+            this.color = newVal;
+            break;
+    }
+}
+```
+
+然后给`this.color`添加setter，当设置 color 的时候，去做一些样式处理。
+
+```
+set color(color) {
+    this.shadowRoot.querySelector('span').style.color = color;
+}
+```
+然后在页面中添加一个测试按钮：
+
+```
+<button id="change">改变颜色</button>
+```
+为测试按钮绑定事件，去改变`word-count`标签的color属性：
+
+```
+document.getElementById('change').addEventListener('click', () => {
+    wordCount.setAttribute('color', 'green');
+});
+```
+测试，可以看到点击按钮的时候，颜色以及改变啦✌️～
+![webc-attribute.gif](./../assets/WebComponents/webc-attribute.gif)
+
+> 这里有点像手动实现数据双向绑定～
 
 
 
