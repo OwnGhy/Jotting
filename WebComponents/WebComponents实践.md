@@ -4,7 +4,7 @@
 ## 自定义元素
 首先，这里实现一个 WordCount 自定义标签的例子，用于统计当前标签的字数，在当前标签最后标识字数。
 
-核心代码如下，创建了一个 WordCount 的类，继承于 HTMLElement，然后在里面添加了一个内容为字数的 span 标签，并添加到当前元素的最后。
+核心代码如下，创建了一个 WordCount 的类，继承于`HTMLElement`，然后在里面添加了一个内容为字数的 span 标签，并添加到当前元素的最后。
 
 然后再通过注册表实例`customElements`调用 define 接口注册自定义元素。define 方法的第一个参数是我们新创建元素的标签名称，必须有短横线`-`，避免与原生元素名字发生冲突。
 
@@ -33,13 +33,34 @@ customElements.define('word-count', WordCount);
 
 ![说明截图1](./../assets/WebComponents/说明截图1.png)
 
-最后渲染出来的DOM结构是这样的，`word-count`是一个真正的自定义的标签，直接使用，并且会直接渲染到 DOM 中。
+最后渲染出来的 DOM 结构是这样的，`word-count`是一个真正的自定义的标签，直接使用，并且会直接渲染到 DOM 中。
 
 ```
 <word-count>
 	这是一段用于统计的文字，我也不知道这里有多少个字呢～
 	<span>（字数：26）</span>
 </word-count>
+```
+
+另外，由于 Web Components 是一个真正的自定义标签，所以，你可以给标签添加所有原生标签支持的属性，例如添加 class，还可以根据 class 给标签设置样式。例如：
+
+```
+// html
+<word-count class="word-count">
+	这是一段用于统计的文字，我也不知道这里有多少个字呢～
+	<span>（字数：26）</span>
+</word-count>
+
+// css
+.word-count {
+	color: #999;
+}
+```
+
+并且可以使用 js 的选择器查询到自定义的标签。例如：
+
+```
+document.querySelector('word-count');
 ```
 
 ## Web Components 自定义公共 API
@@ -64,7 +85,7 @@ class WordCount extends HTMLElement {
 
 customElements.define('word-count', WordCount);
 ```
-然后再JS中，可以直接通过 WordCount 元素的公共 API getCount() 方法获取字数。
+然后再 JS 中，可以直接通过 WordCount 元素的公共 API getCount() 方法获取字数。
 
 ```
 let wordCount = document.querySelector('word-count');
@@ -126,7 +147,7 @@ customElements.define('word-count', WordCount);
 
 ![说明截图1](./../assets/WebComponents/说明截图3.png)
 
-Shadow DOM 内部的元素始终不会影响到它外部的元素，这为封装提供了便利，这也为 CSS 提供了真正的作用域，即组件内定义的所有 CSS 仅适用于组件本身。
+Shadow DOM 内部的元素始终不会影响到它外部的元素，这为封装提供了便利，这也为 `CSS 提供了真正的作用域`，即组件内定义的所有 CSS 仅适用于组件本身。
 
 另，这里的`mode: "open"`表示它可以在开发工具中检查，并通过查询、配置任何公开的 CSS 属性或监听它抛出的事件来交互。
 
